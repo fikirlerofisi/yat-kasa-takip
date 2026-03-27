@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kasa Takip — Yat Turizm</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0d1b2a;
+      --navy2:  #1b2e45;
+      --navy3:  #243b55;
+      --gold:   #c9a84c;
+      --gold2:  #e8c96a;
+      --green:  #2ecc71;
+      --yellow: #f1c40f;
+      --red:    #e74c3c;
+      --text:   #e8edf2;
+      --muted:  #8fa5bc;
+      --border: #2d4a6a;
+      --card:   #182433;
+      --radius: 10px;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--navy2);
+      border-bottom: 2px solid var(--gold);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header .logo { font-size: 1.5rem; flex-shrink: 0; }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: var(--gold2); line-height: 1.2; flex: 1; }
+    header h1 span { display: block; font-size: 0.72rem; font-weight: 400; color: var(--muted); }
+
+    #headerUser {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    #headerUser .uname {
+      font-size: 0.8rem;
+      color: var(--gold2);
+      font-weight: 600;
+      background: rgba(201,168,76,.12);
+      border: 1px solid rgba(201,168,76,.3);
+      border-radius: 20px;
+      padding: 4px 12px;
+    }
+    #headerUser .uname::before { content: '👤 '; }
+    #btnLogout {
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      padding: 5px 10px;
+      font-family: inherit;
+      transition: border-color .15s, color .15s;
+    }
+    #btnLogout:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── AUTH OVERLAY ── */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      background: var(--navy);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #authOverlay.hidden { display: none; }
+
+    .auth-logo {
+      font-size: 2.5rem;
+      margin-bottom: 6px;
+    }
+    .auth-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--gold2);
+      margin-bottom: 4px;
+    }
+    .auth-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .auth-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 400px;
+      overflow: hidden;
+    }
+
+    /* tabs */
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    .auth-tab {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: color .15s, background .15s;
+    }
+    .auth-tab.active {
+      color: var(--gold2);
+      background: rgba(201,168,76,.07);
+      border-bottom: 2px solid var(--gold);
+    }
+
+    .auth-body { padding: 22px; }
+
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; }
+
+    .auth-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .auth-group label { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+    .auth-group input {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .15s;
+      width: 100%;
+    }
+    .auth-group input:focus { border-color: var(--gold); }
+
+    .auth-error {
+      font-size: 0.78rem;
+      color: var(--red);
+      background: rgba(231,76,60,.08);
+      border: 1px solid rgba(231,76,60,.25);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .auth-error.show { display: block; }
+
+    .btn-auth {
+      width: 100%;
+      padding: 12px;
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .15s, transform .1s;
+      margin-top: 4px;
+    }
+    .btn-auth:hover  { opacity: .88; }
+    .btn-auth:active { transform: scale(.98); }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 20px 16px 60px; }
+
+    /* ── DASHBOARD ── */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-card .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .stat-card .value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--gold2);
+      word-break: break-all;
+    }
+    .stat-card .sub { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
+    .stat-card.pending .value { color: var(--yellow); }
+    .stat-card.today .value  { color: var(--green); }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--gold);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── FORM ── */
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+    input, select, textarea {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 9px 11px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .15s;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+    textarea { resize: vertical; min-height: 60px; }
+    select option { background: var(--navy2); }
+
+    /* readonly personel field */
+    input[readonly] {
+      opacity: .75;
+      cursor: not-allowed;
+      border-style: dashed;
+    }
+    .field-locked-note {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .btn {
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 9px 18px;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn:hover  { opacity: .88; }
+    .btn-primary { background: var(--gold); color: var(--navy); }
+    .btn-success { background: var(--green); color: #fff; font-size: 0.78rem; padding: 6px 12px; }
+    .btn-danger  { background: transparent; color: var(--red); border: 1px solid var(--red); font-size: 0.78rem; padding: 6px 12px; }
+    .btn-submit  { margin-top: 14px; width: 100%; padding: 12px; font-size: 0.95rem; }
+
+    /* ── FILTERS ── */
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+    .filters select, .filters input { max-width: 180px; padding: 7px 10px; font-size: 0.82rem; }
+    .filters label { font-size: 0.78rem; color: var(--muted); align-self: center; margin-right: -6px; }
+
+    /* ── LIST ── */
+    #recordList { display: flex; flex-direction: column; gap: 10px; }
+
+    .record-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: start;
+    }
+    .record-card.kasada { border-left: 3px solid var(--green); }
+    .record-card.yolda  { border-left: 3px solid var(--yellow); }
+
+    .record-main { display: flex; flex-direction: column; gap: 6px; }
+    .record-top  { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .record-amount { font-size: 1.2rem; font-weight: 700; color: var(--gold2); }
+    .badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .badge-yolda  { background: rgba(241,196,15,.15);  color: var(--yellow); border: 1px solid rgba(241,196,15,.35); }
+    .badge-kasada { background: rgba(46,204,113,.15);  color: var(--green);  border: 1px solid rgba(46,204,113,.35); }
+
+    .record-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 14px;
+    }
+    .record-meta span { display: flex; align-items: center; gap: 3px; }
+    .record-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      background: var(--navy2);
+      border-radius: 5px;
+      padding: 6px 10px;
+      font-style: italic;
+    }
+    .record-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+
+    /* ── EMPTY ── */
+    .empty { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 0.9rem; }
+    .empty .icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--navy2);
+      color: var(--text);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      padding: 12px 22px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: transform .3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 500px) {
+      .record-card { grid-template-columns: 1fr; }
+      .record-actions { flex-direction: row; }
+      .dashboard { grid-template-columns: 1fr 1fr; }
+      #headerUser .uname { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── AUTH OVERLAY ── -->
+<div id="authOverlay">
+  <div class="auth-logo">⚓</div>
+  <div class="auth-title">Kasa Takip Sistemi</div>
+  <div class="auth-sub">Yat Turizm — Nakit Para Yönetimi</div>
+
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin"  onclick="switchTab('login')">Giriş Yap</button>
+      <button class="auth-tab"        id="tabRegister" onclick="switchTab('register')">Kayıt Ol</button>
+    </div>
+
+    <div class="auth-body">
+      <!-- GİRİŞ -->
+      <div class="auth-panel active" id="panelLogin">
+        <div class="auth-group">
+          <label>E-posta</label>
+          <input type="email" id="l_email" placeholder="ornek@mail.com" autocomplete="email" />
+        </div>
+        <div class="auth-group">
+          <label>Şifre</label>
+          <input type="password" id="l_pw" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div class="auth-error" id="loginErr"></div>
+        <button class="btn-auth" onclick="doLogin()">Giriş Yap</button>
+      </div>
+
+      <!-- KAYIT -->
+      <div class="auth-panel" id="panelRegister">
+        <div class="auth-group">
+          <label>Ad Soyad *</label>
+          <input type="text" id="r_name" placeholder="Görünecek isminiz" autocomplete="name" />
+        </div>
+        <div class="auth-group">
+          <label>E-posta *</label>
+          <input type="email" id="r_email" placeholder="ornek@mail.com" autocomplete="email" />
+        </div>
+        <div class="auth-group">
+          <label>Şifre *</label>
+          <input type="password" id="r_pw" placeholder="En az 6 karakter" autocomplete="new-password" />
+        </div>
+        <div class="auth-group">
+          <label>Şifre Tekrar *</label>
+          <input type="password" id="r_pw2" placeholder="••••••••" autocomplete="new-password" />
+        </div>
+        <div class="auth-error" id="registerErr"></div>
+        <button class="btn-auth" onclick="doRegister()">Hesap Oluştur</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="logo">⚓</div>
+  <h1>Kasa Takip Sistemi <span>Yat Turizm — Nakit Para Yönetimi</span></h1>
+  <div id="headerUser" style="display:none">
+    <span class="uname" id="headerName"></span>
+    <button id="btnLogout" onclick="doLogout()">Çıkış Yap</button>
+  </div>
+</header>
+
+<!-- ── MAIN APP ── -->
+<div class="container" id="appContainer" style="display:none">
+
+  <div class="dashboard" id="dashboard"></div>
+
+  <p class="section-title">💰 Yeni Nakit Kaydı</p>
+  <div class="form-card">
+    <form id="entryForm" autocomplete="off">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Personel Adı</label>
+          <input type="text" id="f_personel" readonly />
+          <span class="field-locked-note">🔒 Giriş yapan hesabın adı</span>
+        </div>
+        <div class="form-group">
+          <label>Müşteri Adı *</label>
+          <input type="text" id="f_musteri" placeholder="Ad Soyad" required />
+        </div>
+        <div class="form-group">
+          <label>Yat / Tur Adı</label>
+          <input type="text" id="f_yat" placeholder="örn. Blue Horizon" />
+        </div>
+        <div class="form-group">
+          <label>Tutar *</label>
+          <input type="number" id="f_tutar" placeholder="0" min="0.01" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label>Para Birimi *</label>
+          <select id="f_birim">
+            <option value="TRY">🇹🇷 TRY — Türk Lirası</option>
+            <option value="EUR">🇪🇺 EUR — Euro</option>
+            <option value="USD">🇺🇸 USD — Dolar</option>
+            <option value="GBP">🇬🇧 GBP — Sterlin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tarih *</label>
+          <input type="date" id="f_tarih" required />
+        </div>
+        <div class="form-group full">
+          <label>Not (opsiyonel)</label>
+          <textarea id="f_not" placeholder="Ek bilgi, açıklama..."></textarea>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-submit">+ Kaydı Ekle</button>
+    </form>
+  </div>
+
+  <p class="section-title">📋 Tüm Kayıtlar</p>
+  <div class="filters">
+    <label>Filtrele:</label>
+    <select id="filterBirim" onchange="renderList()">
+      <option value="">Tüm Para Birimleri</option>
+      <option value="TRY">TRY</option>
+      <option value="EUR">EUR</option>
+      <option value="USD">USD</option>
+      <option value="GBP">GBP</option>
+    </select>
+    <select id="filterDurum" onchange="renderList()">
+      <option value="">Tüm Durumlar</option>
+      <option value="yolda">Yolda</option>
+      <option value="kasada">Kasada</option>
+    </select>
+    <input type="date" id="filterTarih" onchange="renderList()" title="Tarihe göre filtrele" />
+  </div>
+
+  <div id="recordList"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // ── AUTH STORAGE ───────────────────────────────────────────────
+  const USERS_KEY   = 'yat_users_v1';
+  const SESSION_KEY = 'yat_session_v1';
+  const RECORDS_KEY = 'yat_kasa_v1';
+
+  function loadUsers()   { try { return JSON.parse(localStorage.getItem(USERS_KEY))   || []; } catch { return []; } }
+  function saveUsers(u)  { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+  function loadSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || null; } catch { return null; } }
+  function saveSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+  function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+
+  // simple hash (djb2) — iç kullanım aracı, production şifresi değil
+  function hashPw(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) h = ((h << 5) + h) ^ str.charCodeAt(i);
+    return (h >>> 0).toString(16);
+  }
+
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+  // ── AUTH UI ────────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.getElementById('tabLogin').classList.toggle('active',    tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('panelLogin').classList.toggle('active',    tab === 'login');
+    document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
+    clearAuthErrors();
+  }
+
+  function showAuthError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function clearAuthErrors() {
+    ['loginErr','registerErr'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = '';
+      el.classList.remove('show');
+    });
+  }
+
+  function doRegister() {
+    clearAuthErrors();
+    const name  = document.getElementById('r_name').value.trim();
+    const email = document.getElementById('r_email').value.trim().toLowerCase();
+    const pw    = document.getElementById('r_pw').value;
+    const pw2   = document.getElementById('r_pw2').value;
+
+    if (!name)                    return showAuthError('registerErr', 'Ad Soyad boş bırakılamaz.');
+    if (!email || !email.includes('@')) return showAuthError('registerErr', 'Geçerli bir e-posta girin.');
+    if (pw.length < 6)            return showAuthError('registerErr', 'Şifre en az 6 karakter olmalı.');
+    if (pw !== pw2)               return showAuthError('registerErr', 'Şifreler eşleşmiyor.');
+
+    const users = loadUsers();
+    if (users.find(u => u.email === email)) return showAuthError('registerErr', 'Bu e-posta zaten kayıtlı.');
+
+    const user = { id: uid(), name, email, pwHash: hashPw(pw) };
+    users.push(user);
+    saveUsers(users);
+    startSession(user);
+  }
+
+  function doLogin() {
+    clearAuthErrors();
+    const email = document.getElementById('l_email').value.trim().toLowerCase();
+    const pw    = document.getElementById('l_pw').value;
+
+    if (!email || !pw) return showAuthError('loginErr', 'E-posta ve şifre gerekli.');
+
+    const users = loadUsers();
+    const user  = users.find(u => u.email === email && u.pwHash === hashPw(pw));
+    if (!user) return showAuthError('loginErr', 'E-posta veya şifre hatalı.');
+
+    startSession(user);
+  }
+
+  function startSession(user) {
+    const session = { userId: user.id, name: user.name, email: user.email };
+    saveSession(session);
+    applySession(session);
+  }
+
+  function doLogout() {
+    clearSession();
+    currentSession = null;
+    document.getElementById('authOverlay').classList.remove('hidden');
+    document.getElementById('appContainer').style.display = 'none';
+    document.getElementById('headerUser').style.display = 'none';
+    // clear login fields
+    document.getElementById('l_email').value = '';
+    document.getElementById('l_pw').value    = '';
+    clearAuthErrors();
+    switchTab('login');
+  }
+
+  function applySession(session) {
+    currentSession = session;
+    document.getElementById('authOverlay').classList.add('hidden');
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('headerUser').style.display   = 'flex';
+    document.getElementById('headerName').textContent     = session.name;
+    document.getElementById('f_personel').value           = session.name;
+    document.getElementById('f_tarih').value              = today();
+    renderDashboard();
+    renderList();
+  }
+
+  // ── ENTER with keyboard ────────────────────────────────────────
+  document.getElementById('l_pw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('r_pw2').addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
+
+  // ── DATA ──────────────────────────────────────────────────────
+  function loadRecords() { try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || []; } catch { return []; } }
+  function saveRecords(d){ localStorage.setItem(RECORDS_KEY, JSON.stringify(d)); }
+
+  let records = loadRecords();
+  let currentSession = null;
+
+  // ── UTILS ─────────────────────────────────────────────────────
+  function fmt(num, birim) {
+    const syms = { TRY: '₺', EUR: '€', USD: '$', GBP: '£' };
+    return (syms[birim] || '') + Number(num).toLocaleString('tr-TR', { minimumFractionDigits: 2 });
+  }
+  function fmtDate(d) {
+    if (!d) return '';
+    const [y, m, dd] = d.split('-');
+    return `${dd}.${m}.${y}`;
+  }
+  function today() { return new Date().toISOString().slice(0, 10); }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  // ── DASHBOARD ─────────────────────────────────────────────────
+  function renderDashboard() {
+    const el = document.getElementById('dashboard');
+    const todayStr = today();
+    const kasaTotals = {}, yoldaTotals = {};
+    let todayCount = 0;
+
+    records.forEach(r => {
+      if (r.tarih === todayStr) todayCount++;
+      if (r.durum === 'kasada') {
+        kasaTotals[r.birim] = (kasaTotals[r.birim] || 0) + Number(r.tutar);
+      } else {
+        yoldaTotals[r.birim] = (yoldaTotals[r.birim] || 0) + Number(r.tutar);
+      }
+    });
+
+    const kasaEntries = Object.entries(kasaTotals);
+    const yoldaEntries = Object.entries(yoldaTotals);
+    const yoldaCount = records.filter(r => r.durum === 'yolda').length;
+    let html = '';
+
+    if (kasaEntries.length === 0) {
+      html += `<div class="stat-card"><div class="label">Kasadaki Para</div><div class="value" style="color:var(--muted)">—</div><div class="sub">henüz kayıt yok</div></div>`;
+    } else {
+      kasaEntries.forEach(([birim, total]) => {
+        html += `<div class="stat-card"><div class="label">Kasa — ${birim}</div><div class="value">${fmt(total, birim)}</div><div class="sub">teslim alındı</div></div>`;
+      });
+    }
+    yoldaEntries.forEach(([birim, total]) => {
+      html += `<div class="stat-card pending"><div class="label">Bekleyen — ${birim}</div><div class="value">${fmt(total, birim)}</div><div class="sub">${yoldaCount} kayıt yolda</div></div>`;
+    });
+    html += `<div class="stat-card today"><div class="label">Bugün Eklenen</div><div class="value">${todayCount}</div><div class="sub">kayıt</div></div>`;
+    el.innerHTML = html;
+  }
+
+  // ── LIST ──────────────────────────────────────────────────────
+  function renderList() {
+    if (!currentSession) return;
+    const birimF = document.getElementById('filterBirim').value;
+    const durumF = document.getElementById('filterDurum').value;
+    const tarihF = document.getElementById('filterTarih').value;
+
+    let filtered = [...records].reverse();
+    if (birimF) filtered = filtered.filter(r => r.birim === birimF);
+    if (durumF) filtered = filtered.filter(r => r.durum === durumF);
+    if (tarihF) filtered = filtered.filter(r => r.tarih === tarihF);
+
+    const el = document.getElementById('recordList');
+    if (filtered.length === 0) {
+      el.innerHTML = `<div class="empty"><div class="icon">🗂️</div>Kayıt bulunamadı.</div>`;
+      return;
+    }
+
+    el.innerHTML = filtered.map(r => {
+      const isMine = r.userId === currentSession.userId;
+      return `
+      <div class="record-card ${r.durum}" id="card-${r.id}">
+        <div class="record-main">
+          <div class="record-top">
+            <span class="record-amount">${fmt(r.tutar, r.birim)}</span>
+            <span class="badge badge-${r.durum}">${r.durum === 'kasada' ? '✓ Kasada' : '⏳ Yolda'}</span>
+          </div>
+          <div class="record-meta">
+            <span>👤 <strong>${esc(r.personel)}</strong>${isMine ? ' <span style="color:var(--gold);font-size:.68rem">(ben)</span>' : ''}</span>
+            <span>🧑‍💼 ${esc(r.musteri)}</span>
+            ${r.yat ? `<span>⛵ ${esc(r.yat)}</span>` : ''}
+            <span>📅 ${fmtDate(r.tarih)}</span>
+          </div>
+          ${r.not ? `<div class="record-note">"${esc(r.not)}"</div>` : ''}
+        </div>
+        <div class="record-actions">
+          ${r.durum === 'yolda'
+            ? `<button class="btn btn-success" onclick="teslimAl('${r.id}')">✓ Kasaya Teslim Alındı</button>`
+            : `<span style="font-size:.72rem;color:var(--green)">Kasada</span>`
+          }
+          ${isMine
+            ? `<button class="btn btn-danger" onclick="sil('${r.id}')">Sil</button>`
+            : ''
+          }
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function esc(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ── ACTIONS ───────────────────────────────────────────────────
+  function teslimAl(id) {
+    const r = records.find(x => x.id === id);
+    if (!r) return;
+    r.durum = 'kasada';
+    saveRecords(records);
+    renderDashboard();
+    renderList();
+    showToast('✓ Kayıt kasaya teslim alındı olarak işaretlendi.');
+  }
+
+  function sil(id) {
+    const r = records.find(x => x.id === id);
+    if (!r || r.userId !== currentSession.userId) return;
+    if (!confirm('Bu kaydı silmek istediğinizden emin misiniz?')) return;
+    records = records.filter(x => x.id !== id);
+    saveRecords(records);
+    renderDashboard();
+    renderList();
+    showToast('Kayıt silindi.');
+  }
+
+  // ── ENTRY FORM ────────────────────────────────────────────────
+  document.getElementById('entryForm').addEventListener('submit', e => {
+    e.preventDefault();
+    if (!currentSession) return;
+    const musteri = document.getElementById('f_musteri').value.trim();
+    const yat     = document.getElementById('f_yat').value.trim();
+    const tutar   = parseFloat(document.getElementById('f_tutar').value);
+    const birim   = document.getElementById('f_birim').value;
+    const tarih   = document.getElementById('f_tarih').value;
+    const not     = document.getElementById('f_not').value.trim();
+
+    if (!musteri || !tutar || !tarih) return;
+
+    records.push({
+      id:       uid(),
+      userId:   currentSession.userId,
+      personel: currentSession.name,
+      musteri, yat, tutar, birim, tarih, not,
+      durum: 'yolda'
+    });
+    saveRecords(records);
+    renderDashboard();
+    renderList();
+
+    document.getElementById('f_musteri').value = '';
+    document.getElementById('f_yat').value     = '';
+    document.getElementById('f_tutar').value   = '';
+    document.getElementById('f_not').value     = '';
+    document.getElementById('f_tarih').value   = today();
+    showToast('✓ Kayıt eklendi — durum: Yolda');
+  });
+
+  // ── INIT ──────────────────────────────────────────────────────
+  (function init() {
+    const session = loadSession();
+    if (session) {
+      applySession(session);
+    }
+    // else: authOverlay is already visible by default
+  })();
+</script>
+</body>
+</html>
