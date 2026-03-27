@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kasa Takip — Yat Turizm</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -376,6 +377,64 @@
     }
     #toast.show { transform: translateX(-50%) translateY(0); }
 
+    /* ── VERIFY PANEL ── */
+    .verify-info {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .verify-info strong { color: var(--gold2); }
+    .code-input-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .code-digit {
+      width: 44px;
+      height: 52px;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      padding: 0;
+      border-radius: 8px;
+      caret-color: transparent;
+    }
+    .code-digit:focus { border-color: var(--gold); }
+    .resend-row {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    #btnResend {
+      background: none;
+      border: none;
+      color: var(--gold);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0;
+      text-decoration: underline;
+    }
+    #btnResend:disabled { color: var(--muted); text-decoration: none; cursor: default; }
+    #btnBackToRegister {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0;
+      text-decoration: underline;
+      display: block;
+      margin: 10px auto 0;
+    }
+
     @media (max-width: 500px) {
       .record-card { grid-template-columns: 1fr; }
       .record-actions { flex-direction: row; }
@@ -411,6 +470,29 @@
         </div>
         <div class="auth-error" id="loginErr"></div>
         <button class="btn-auth" onclick="doLogin()">Giriş Yap</button>
+      </div>
+
+      <!-- DOĞRULAMA -->
+      <div class="auth-panel" id="panelVerify">
+        <p class="verify-info">
+          <strong id="verifyEmailDisplay"></strong> adresine 6 haneli doğrulama kodu gönderdik.<br />
+          Kodu girerek hesabınızı aktif edin.
+        </p>
+        <div class="code-input-row" id="codeInputRow">
+          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="0" />
+          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="1" />
+          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="2" />
+          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="3" />
+          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="4" />
+          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="5" />
+        </div>
+        <div class="auth-error" id="verifyErr"></div>
+        <button class="btn-auth" onclick="doVerify()">Kodu Onayla</button>
+        <div class="resend-row">
+          Kodu almadınız mı?
+          <button id="btnResend" onclick="resendCode()" disabled></button>
+        </div>
+        <button id="btnBackToRegister" onclick="switchTab('register')">← Kayıt formuna dön</button>
       </div>
 
       <!-- KAYIT -->
@@ -520,6 +602,20 @@
 <div id="toast"></div>
 
 <script>
+  // ══════════════════════════════════════════════════════════════
+  //  EmailJS AYARLARI — emailjs.com üzerinden alın
+  //  1. emailjs.com → Ücretsiz kayıt
+  //  2. Email Services → Gmail bağla → Service ID'yi kopyala
+  //  3. Email Templates → Yeni şablon oluştur (aşağıdaki değişkenleri kullanın):
+  //     Konu : Kasa Takip — Doğrulama Kodunuz
+  //     İçerik: Merhaba {{to_name}}, doğrulama kodunuz: {{code}}
+  //     To Email alanı: {{to_email}}
+  //  4. Account → Public Key'i kopyala
+  // ══════════════════════════════════════════════════════════════
+  const EMAILJS_PUBLIC_KEY  = 'BURAYA_PUBLIC_KEY';   // örn. 'abc123XYZ'
+  const EMAILJS_SERVICE_ID  = 'BURAYA_SERVICE_ID';   // örn. 'service_xxxxxx'
+  const EMAILJS_TEMPLATE_ID = 'BURAYA_TEMPLATE_ID';  // örn. 'template_xxxxxx'
+
   // ── AUTH STORAGE ───────────────────────────────────────────────
   const USERS_KEY   = 'yat_users_v1';
   const SESSION_KEY = 'yat_session_v1';
@@ -540,12 +636,131 @@
 
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
+  // EmailJS başlat
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+
+  // ── DOĞRULAMA KODU ────────────────────────────────────────────
+  // Bekleyen kayıt (henüz doğrulanmamış) — bellekte tutulur, localStorage'a yazılmaz
+  let pendingUser = null;
+  let pendingCode = null;
+  let resendTimer = null;
+
+  function generateCode() {
+    return String(Math.floor(100000 + Math.random() * 900000));
+  }
+
+  async function sendVerificationEmail(toEmail, toName, code) {
+    return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: toEmail,
+      to_name:  toName,
+      code:     code
+    });
+  }
+
+  // Geri sayım için yardımcı
+  function startResendCountdown(secs) {
+    const btn = document.getElementById('btnResend');
+    btn.disabled = true;
+    let remaining = secs;
+    btn.textContent = `Tekrar gönder (${remaining}s)`;
+    clearInterval(resendTimer);
+    resendTimer = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(resendTimer);
+        btn.disabled = false;
+        btn.textContent = 'Tekrar gönder';
+      } else {
+        btn.textContent = `Tekrar gönder (${remaining}s)`;
+      }
+    }, 1000);
+  }
+
+  // 6 kutucuklı kod girişi — klavye yönetimi
+  document.querySelectorAll('.code-digit').forEach(input => {
+    input.addEventListener('input', e => {
+      const val = e.target.value.replace(/\D/g, '');
+      e.target.value = val.slice(-1);
+      if (val && Number(e.target.dataset.idx) < 5) {
+        document.querySelectorAll('.code-digit')[Number(e.target.dataset.idx) + 1].focus();
+      }
+    });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !e.target.value && Number(e.target.dataset.idx) > 0) {
+        document.querySelectorAll('.code-digit')[Number(e.target.dataset.idx) - 1].focus();
+      }
+      if (e.key === 'Enter') doVerify();
+    });
+    input.addEventListener('paste', e => {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+      document.querySelectorAll('.code-digit').forEach((inp, i) => { inp.value = pasted[i] || ''; });
+      if (pasted.length === 6) doVerify();
+    });
+  });
+
+  function getEnteredCode() {
+    return [...document.querySelectorAll('.code-digit')].map(i => i.value).join('');
+  }
+  function clearCodeInputs() {
+    document.querySelectorAll('.code-digit').forEach(i => i.value = '');
+    document.querySelectorAll('.code-digit')[0].focus();
+  }
+
+  async function resendCode() {
+    if (!pendingUser) return;
+    pendingCode = generateCode();
+    document.getElementById('verifyErr').classList.remove('show');
+    try {
+      await sendVerificationEmail(pendingUser.email, pendingUser.name, pendingCode);
+      startResendCountdown(60);
+      showToast('✉️ Yeni kod gönderildi.');
+    } catch {
+      showToast('E-posta gönderilemedi, lütfen tekrar deneyin.');
+    }
+  }
+
+  function doVerify() {
+    const entered = getEnteredCode();
+    const errEl = document.getElementById('verifyErr');
+    errEl.classList.remove('show');
+
+    if (entered.length < 6) {
+      errEl.textContent = '6 haneli kodu eksiksiz girin.';
+      return errEl.classList.add('show');
+    }
+    if (entered !== pendingCode) {
+      errEl.textContent = 'Kod hatalı. Lütfen tekrar deneyin.';
+      errEl.classList.add('show');
+      clearCodeInputs();
+      return;
+    }
+
+    // Doğrulama başarılı — kullanıcıyı kaydet
+    const users = loadUsers();
+    users.push(pendingUser);
+    saveUsers(users);
+    pendingUser = null;
+    pendingCode = null;
+    clearInterval(resendTimer);
+    startSession(loadUsers().find(u => u.id === users[users.length - 1].id));
+    showToast('✓ Hesabınız doğrulandı, hoş geldiniz!');
+  }
+
   // ── AUTH UI ────────────────────────────────────────────────────
   function switchTab(tab) {
-    document.getElementById('tabLogin').classList.toggle('active',    tab === 'login');
-    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
-    document.getElementById('panelLogin').classList.toggle('active',    tab === 'login');
-    document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
+    const tabs   = { login: 'tabLogin', register: 'tabRegister', verify: null };
+    const panels = { login: 'panelLogin', register: 'panelRegister', verify: 'panelVerify' };
+
+    ['tabLogin','tabRegister'].forEach(id => {
+      document.getElementById(id).classList.toggle('active', id === tabs[tab]);
+    });
+    ['panelLogin','panelRegister','panelVerify'].forEach(id => {
+      document.getElementById(id).classList.toggle('active', id === panels[tab]);
+    });
+
+    // verify sekmesinde tab butonlarını gizle
+    document.querySelector('.auth-tabs').style.display = tab === 'verify' ? 'none' : '';
     clearAuthErrors();
   }
 
@@ -555,32 +770,51 @@
     el.classList.add('show');
   }
   function clearAuthErrors() {
-    ['loginErr','registerErr'].forEach(id => {
+    ['loginErr','registerErr','verifyErr'].forEach(id => {
       const el = document.getElementById(id);
       el.textContent = '';
       el.classList.remove('show');
     });
   }
 
-  function doRegister() {
+  async function doRegister() {
     clearAuthErrors();
     const name  = document.getElementById('r_name').value.trim();
     const email = document.getElementById('r_email').value.trim().toLowerCase();
     const pw    = document.getElementById('r_pw').value;
     const pw2   = document.getElementById('r_pw2').value;
 
-    if (!name)                    return showAuthError('registerErr', 'Ad Soyad boş bırakılamaz.');
+    if (!name)                         return showAuthError('registerErr', 'Ad Soyad boş bırakılamaz.');
     if (!email || !email.includes('@')) return showAuthError('registerErr', 'Geçerli bir e-posta girin.');
-    if (pw.length < 6)            return showAuthError('registerErr', 'Şifre en az 6 karakter olmalı.');
-    if (pw !== pw2)               return showAuthError('registerErr', 'Şifreler eşleşmiyor.');
+    if (pw.length < 6)                 return showAuthError('registerErr', 'Şifre en az 6 karakter olmalı.');
+    if (pw !== pw2)                    return showAuthError('registerErr', 'Şifreler eşleşmiyor.');
 
     const users = loadUsers();
     if (users.find(u => u.email === email)) return showAuthError('registerErr', 'Bu e-posta zaten kayıtlı.');
 
-    const user = { id: uid(), name, email, pwHash: hashPw(pw) };
-    users.push(user);
-    saveUsers(users);
-    startSession(user);
+    // Kullanıcıyı henüz kaydetme — önce e-posta doğrula
+    pendingUser = { id: uid(), name, email, pwHash: hashPw(pw) };
+    pendingCode = generateCode();
+
+    // Butonu devre dışı bırak
+    const btn = document.querySelector('#panelRegister .btn-auth');
+    btn.disabled = true;
+    btn.textContent = 'Gönderiliyor...';
+
+    try {
+      await sendVerificationEmail(email, name, pendingCode);
+      document.getElementById('verifyEmailDisplay').textContent = email;
+      clearCodeInputs();
+      switchTab('verify');
+      startResendCountdown(60);
+    } catch (err) {
+      showAuthError('registerErr', 'E-posta gönderilemedi. EmailJS ayarlarını kontrol edin.');
+      pendingUser = null;
+      pendingCode = null;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Hesap Oluştur';
+    }
   }
 
   function doLogin() {
