@@ -345,7 +345,7 @@
 <div id="authOverlay">
   <div class="auth-logo"><img src="Logo/GoldenCity.png" alt="Golden City Logo" /></div>
   <div class="auth-title">Nakit Takip Sistemi</div>
-  <div class="auth-sub">Yat Turizm — Nakit Para Yönetimi</div>
+  <div class="auth-sub">Golden City Tours — Nakit Para Yönetimi</div>
 
   <div class="auth-card">
     <div class="auth-tabs">
@@ -396,7 +396,7 @@
 <!-- ── HEADER ── -->
 <header>
   <div class="logo"><img src="Logo/GoldenCity.png" alt="Logo" /></div>
-  <h1>Nakit Takip Sistemi <span>Yat Turizm — Nakit Para Yönetimi</span></h1>
+  <h1>Nakit Takip Sistemi <span>Golden City Tours — Nakit Para Yönetimi</span></h1>
   <div id="headerUser" style="display:none">
     <span class="uname" id="headerName"></span>
     <button id="btnLogout" onclick="doLogout()">Çıkış Yap</button>
@@ -422,8 +422,14 @@
           <input type="text" id="f_musteri" placeholder="Ad Soyad" required />
         </div>
         <div class="form-group">
-          <label>Yat / Tur Adı</label>
-          <input type="text" id="f_yat" placeholder="örn. Blue Horizon" />
+          <label>Yat Adı</label>
+          <select id="f_yat">
+            <option value="">— Seçiniz —</option>
+            <option value="River Yacht">River Yacht</option>
+            <option value="River M Yacht">River M Yacht</option>
+            <option value="River Mega Yacht">River Mega Yacht</option>
+            <option value="Diğer">Diğer</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Tutar *</label>
