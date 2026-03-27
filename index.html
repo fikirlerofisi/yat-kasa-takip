@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kasa Takip — Yat Turizm</title>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -75,149 +74,6 @@
       transition: border-color .15s, color .15s;
     }
     #btnLogout:hover { border-color: var(--red); color: var(--red); }
-    #btnSetup {
-      cursor: pointer;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--muted);
-      font-size: 0.78rem;
-      padding: 5px 8px;
-      font-family: inherit;
-      transition: border-color .15s, color .15s;
-    }
-    #btnSetup:hover { border-color: var(--gold); color: var(--gold); }
-
-    /* ── SETUP WIZARD ── */
-    #setupOverlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(13,27,42,.85);
-      z-index: 300;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    #setupOverlay.hidden { display: none; }
-    .setup-card {
-      background: var(--card);
-      border: 1px solid var(--gold);
-      border-radius: 14px;
-      width: 100%;
-      max-width: 480px;
-      padding: 24px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .setup-card h2 {
-      font-size: 1rem;
-      color: var(--gold2);
-      margin-bottom: 4px;
-    }
-    .setup-card .setup-sub {
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-    .setup-steps {
-      background: var(--navy2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 16px;
-      margin-bottom: 20px;
-      font-size: 0.78rem;
-      line-height: 1.7;
-      color: var(--muted);
-    }
-    .setup-steps summary {
-      cursor: pointer;
-      color: var(--gold);
-      font-weight: 600;
-      font-size: 0.8rem;
-      list-style: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .setup-steps summary::before { content: '▶'; font-size: .65rem; transition: transform .2s; }
-    details[open] .setup-steps summary::before { transform: rotate(90deg); }
-    details[open] .setup-steps { padding-bottom: 14px; }
-    .setup-steps ol { padding-left: 16px; margin-top: 10px; }
-    .setup-steps li { margin-bottom: 6px; }
-    .setup-steps code {
-      background: var(--navy3);
-      border-radius: 4px;
-      padding: 1px 5px;
-      font-size: 0.82rem;
-      color: var(--gold2);
-      font-family: monospace;
-    }
-    .setup-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
-    .setup-group label { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
-    .setup-group input {
-      background: var(--navy2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      padding: 10px 12px;
-      font-size: 0.88rem;
-      font-family: monospace;
-      outline: none;
-      transition: border-color .15s;
-      width: 100%;
-    }
-    .setup-group input:focus { border-color: var(--gold); }
-    .setup-group .setup-hint { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
-    .setup-error {
-      font-size: 0.78rem;
-      color: var(--red);
-      background: rgba(231,76,60,.08);
-      border: 1px solid rgba(231,76,60,.25);
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin-bottom: 12px;
-      display: none;
-    }
-    .setup-error.show { display: block; }
-    .setup-success {
-      font-size: 0.78rem;
-      color: var(--green);
-      background: rgba(46,204,113,.08);
-      border: 1px solid rgba(46,204,113,.25);
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin-bottom: 12px;
-      display: none;
-    }
-    .setup-success.show { display: block; }
-    .setup-btns { display: flex; gap: 10px; }
-    .btn-setup-save {
-      flex: 1;
-      padding: 11px;
-      background: var(--gold);
-      color: var(--navy);
-      border: none;
-      border-radius: 6px;
-      font-weight: 700;
-      font-size: 0.88rem;
-      cursor: pointer;
-      font-family: inherit;
-      transition: opacity .15s;
-    }
-    .btn-setup-save:hover { opacity: .88; }
-    .btn-setup-skip {
-      padding: 11px 16px;
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.82rem;
-      cursor: pointer;
-      font-family: inherit;
-      transition: border-color .15s;
-    }
-    .btn-setup-skip:hover { border-color: var(--muted); }
 
     /* ── AUTH OVERLAY ── */
     #authOverlay {
@@ -233,21 +89,9 @@
     }
     #authOverlay.hidden { display: none; }
 
-    .auth-logo {
-      font-size: 2.5rem;
-      margin-bottom: 6px;
-    }
-    .auth-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--gold2);
-      margin-bottom: 4px;
-    }
-    .auth-sub {
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-bottom: 24px;
-    }
+    .auth-logo { font-size: 2.5rem; margin-bottom: 6px; }
+    .auth-title { font-size: 1.1rem; font-weight: 700; color: var(--gold2); margin-bottom: 4px; }
+    .auth-sub   { font-size: 0.75rem; color: var(--muted); margin-bottom: 24px; }
 
     .auth-card {
       background: var(--card);
@@ -258,7 +102,6 @@
       overflow: hidden;
     }
 
-    /* tabs */
     .auth-tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -282,7 +125,6 @@
     }
 
     .auth-body { padding: 22px; }
-
     .auth-panel { display: none; }
     .auth-panel.active { display: block; }
 
@@ -348,22 +190,11 @@
       padding: 16px;
       text-align: center;
     }
-    .stat-card .label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .stat-card .value {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: var(--gold2);
-      word-break: break-all;
-    }
-    .stat-card .sub { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
+    .stat-card .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 6px; }
+    .stat-card .value { font-size: 1.35rem; font-weight: 700; color: var(--gold2); word-break: break-all; }
+    .stat-card .sub   { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
     .stat-card.pending .value { color: var(--yellow); }
-    .stat-card.today .value  { color: var(--green); }
+    .stat-card.today .value   { color: var(--green); }
 
     /* ── SECTION TITLE ── */
     .section-title {
@@ -410,17 +241,8 @@
     textarea { resize: vertical; min-height: 60px; }
     select option { background: var(--navy2); }
 
-    /* readonly personel field */
-    input[readonly] {
-      opacity: .75;
-      cursor: not-allowed;
-      border-style: dashed;
-    }
-    .field-locked-note {
-      font-size: 0.68rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
+    input[readonly] { opacity: .75; cursor: not-allowed; border-style: dashed; }
+    .field-locked-note { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
 
     .btn {
       cursor: pointer;
@@ -479,22 +301,9 @@
     .badge-yolda  { background: rgba(241,196,15,.15);  color: var(--yellow); border: 1px solid rgba(241,196,15,.35); }
     .badge-kasada { background: rgba(46,204,113,.15);  color: var(--green);  border: 1px solid rgba(46,204,113,.35); }
 
-    .record-meta {
-      font-size: 0.8rem;
-      color: var(--muted);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 14px;
-    }
+    .record-meta { font-size: 0.8rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; }
     .record-meta span { display: flex; align-items: center; gap: 3px; }
-    .record-note {
-      font-size: 0.78rem;
-      color: var(--muted);
-      background: var(--navy2);
-      border-radius: 5px;
-      padding: 6px 10px;
-      font-style: italic;
-    }
+    .record-note { font-size: 0.78rem; color: var(--muted); background: var(--navy2); border-radius: 5px; padding: 6px 10px; font-style: italic; }
     .record-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
 
     /* ── EMPTY ── */
@@ -520,64 +329,6 @@
     }
     #toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* ── VERIFY PANEL ── */
-    .verify-info {
-      font-size: 0.82rem;
-      color: var(--muted);
-      line-height: 1.55;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    .verify-info strong { color: var(--gold2); }
-    .code-input-row {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 14px;
-    }
-    .code-digit {
-      width: 44px;
-      height: 52px;
-      text-align: center;
-      font-size: 1.4rem;
-      font-weight: 700;
-      letter-spacing: 0;
-      padding: 0;
-      border-radius: 8px;
-      caret-color: transparent;
-    }
-    .code-digit:focus { border-color: var(--gold); }
-    .resend-row {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-    #btnResend {
-      background: none;
-      border: none;
-      color: var(--gold);
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0;
-      text-decoration: underline;
-    }
-    #btnResend:disabled { color: var(--muted); text-decoration: none; cursor: default; }
-    #btnBackToRegister {
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 0.75rem;
-      padding: 0;
-      text-decoration: underline;
-      display: block;
-      margin: 10px auto 0;
-    }
-
     @media (max-width: 500px) {
       .record-card { grid-template-columns: 1fr; }
       .record-actions { flex-direction: row; }
@@ -588,55 +339,6 @@
 </head>
 <body>
 
-<!-- ── EMAILJS SETUP WIZARD ── -->
-<div id="setupOverlay" class="hidden">
-  <div class="setup-card">
-    <h2>⚙️ EmailJS Kurulumu</h2>
-    <p class="setup-sub">E-posta doğrulaması için EmailJS bilgilerini girin. Ücretsiz.</p>
-
-    <details>
-      <div class="setup-steps">
-        <summary>📋 Bilgileri nereden alırım?</summary>
-        <ol>
-          <li><strong>emailjs.com</strong> adresine gidin → <em>Sign Up</em> ile ücretsiz hesap açın.</li>
-          <li>Sol menü → <strong>Email Services</strong> → <em>Add New Service</em> → Gmail seçin → Gmail hesabınızla bağlayın.<br/>
-              Bağlantı sonrası görünen <strong>Service ID</strong>'yi kopyalayın. <code>service_xxxxxxx</code></li>
-          <li>Sol menü → <strong>Email Templates</strong> → <em>Create New Template</em><br/>
-              &nbsp;• <em>Subject:</em> Doğrulama Kodunuz<br/>
-              &nbsp;• <em>To Email:</em> <code>&#123;&#123;to_email&#125;&#125;</code><br/>
-              &nbsp;• <em>Content:</em> Merhaba <code>&#123;&#123;to_name&#125;&#125;</code>, kodunuz: <code>&#123;&#123;code&#125;&#125;</code><br/>
-              Kaydet → <strong>Template ID</strong>'yi kopyalayın. <code>template_xxxxxxx</code></li>
-          <li>Sol üst → hesap adına tıklayın → <strong>Account</strong> → <em>General</em> bölümünde <strong>Public Key</strong>'i kopyalayın.</li>
-        </ol>
-      </div>
-    </details>
-
-    <div class="setup-group">
-      <label>Public Key</label>
-      <input type="text" id="s_pubkey" placeholder="örn. aBcDeFgHiJkLmN" autocomplete="off" />
-      <span class="setup-hint">Account → General → Public Key</span>
-    </div>
-    <div class="setup-group">
-      <label>Service ID</label>
-      <input type="text" id="s_service" placeholder="örn. service_abc1234" autocomplete="off" />
-      <span class="setup-hint">Email Services → servis adının yanındaki ID</span>
-    </div>
-    <div class="setup-group">
-      <label>Template ID</label>
-      <input type="text" id="s_template" placeholder="örn. template_xyz7890" autocomplete="off" />
-      <span class="setup-hint">Email Templates → şablon adının yanındaki ID</span>
-    </div>
-
-    <div class="setup-error"   id="setupErr"></div>
-    <div class="setup-success" id="setupOk">✓ Bağlantı başarılı! Artık e-posta gönderilebilir.</div>
-
-    <div class="setup-btns">
-      <button class="btn-setup-save" onclick="saveSetup()">Kaydet &amp; Test Et</button>
-      <button class="btn-setup-skip" onclick="closeSetup()">Şimdi değil</button>
-    </div>
-  </div>
-</div>
-
 <!-- ── AUTH OVERLAY ── -->
 <div id="authOverlay">
   <div class="auth-logo">⚓</div>
@@ -645,7 +347,7 @@
 
   <div class="auth-card">
     <div class="auth-tabs">
-      <button class="auth-tab active" id="tabLogin"  onclick="switchTab('login')">Giriş Yap</button>
+      <button class="auth-tab active" id="tabLogin"    onclick="switchTab('login')">Giriş Yap</button>
       <button class="auth-tab"        id="tabRegister" onclick="switchTab('register')">Kayıt Ol</button>
     </div>
 
@@ -664,34 +366,11 @@
         <button class="btn-auth" onclick="doLogin()">Giriş Yap</button>
       </div>
 
-      <!-- DOĞRULAMA -->
-      <div class="auth-panel" id="panelVerify">
-        <p class="verify-info">
-          <strong id="verifyEmailDisplay"></strong> adresine 6 haneli doğrulama kodu gönderdik.<br />
-          Kodu girerek hesabınızı aktif edin.
-        </p>
-        <div class="code-input-row" id="codeInputRow">
-          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="0" />
-          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="1" />
-          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="2" />
-          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="3" />
-          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="4" />
-          <input class="code-digit" type="text" inputmode="numeric" maxlength="1" data-idx="5" />
-        </div>
-        <div class="auth-error" id="verifyErr"></div>
-        <button class="btn-auth" onclick="doVerify()">Kodu Onayla</button>
-        <div class="resend-row">
-          Kodu almadınız mı?
-          <button id="btnResend" onclick="resendCode()" disabled></button>
-        </div>
-        <button id="btnBackToRegister" onclick="switchTab('register')">← Kayıt formuna dön</button>
-      </div>
-
       <!-- KAYIT -->
       <div class="auth-panel" id="panelRegister">
         <div class="auth-group">
           <label>Ad Soyad *</label>
-          <input type="text" id="r_name" placeholder="Görünecek isminiz" autocomplete="name" />
+          <input type="text" id="r_name" placeholder="Kayıtlarda görünecek isim" autocomplete="name" />
         </div>
         <div class="auth-group">
           <label>E-posta *</label>
@@ -718,7 +397,6 @@
   <h1>Kasa Takip Sistemi <span>Yat Turizm — Nakit Para Yönetimi</span></h1>
   <div id="headerUser" style="display:none">
     <span class="uname" id="headerName"></span>
-    <button id="btnSetup" onclick="openSetup()" title="EmailJS Ayarları">⚙️</button>
     <button id="btnLogout" onclick="doLogout()">Çıkış Yap</button>
   </div>
 </header>
@@ -795,238 +473,57 @@
 <div id="toast"></div>
 
 <script>
-  // ── EMAILJS CONFIG (localStorage'dan yüklenir) ────────────────
-  const EJSCONFIG_KEY = 'yat_emailjs_config';
-
-  function loadEjsConfig() {
-    try { return JSON.parse(localStorage.getItem(EJSCONFIG_KEY)) || {}; } catch { return {}; }
-  }
-  function saveEjsConfig(cfg) { localStorage.setItem(EJSCONFIG_KEY, JSON.stringify(cfg)); }
-
-  function getEjsCredentials() {
-    const cfg = loadEjsConfig();
-    return {
-      publicKey:  cfg.publicKey  || '',
-      serviceId:  cfg.serviceId  || '',
-      templateId: cfg.templateId || ''
-    };
-  }
-
-  function credentialsReady() {
-    const c = getEjsCredentials();
-    return c.publicKey && c.serviceId && c.templateId;
-  }
-
-  // EmailJS'i mevcut credentials ile (yeniden) başlat
-  function initEmailJs() {
-    const c = getEjsCredentials();
-    if (c.publicKey) emailjs.init(c.publicKey);
-  }
-
-  // ── SETUP WIZARD ──────────────────────────────────────────────
-  function openSetup() {
-    const c = getEjsCredentials();
-    document.getElementById('s_pubkey').value   = c.publicKey  || '';
-    document.getElementById('s_service').value  = c.serviceId  || '';
-    document.getElementById('s_template').value = c.templateId || '';
-    document.getElementById('setupErr').classList.remove('show');
-    document.getElementById('setupOk').classList.remove('show');
-    document.getElementById('setupOverlay').classList.remove('hidden');
-  }
-
-  function closeSetup() {
-    document.getElementById('setupOverlay').classList.add('hidden');
-  }
-
-  async function saveSetup() {
-    const pubkey   = document.getElementById('s_pubkey').value.trim();
-    const service  = document.getElementById('s_service').value.trim();
-    const template = document.getElementById('s_template').value.trim();
-    const errEl    = document.getElementById('setupErr');
-    const okEl     = document.getElementById('setupOk');
-    errEl.classList.remove('show');
-    okEl.classList.remove('show');
-
-    if (!pubkey || !service || !template) {
-      errEl.textContent = 'Üç alan da dolu olmalı.';
-      return errEl.classList.add('show');
-    }
-
-    const btn = document.querySelector('.btn-setup-save');
-    btn.disabled = true;
-    btn.textContent = 'Test ediliyor...';
-
-    try {
-      emailjs.init(pubkey);
-      // Test e-postası olarak kendi kaydedilmiş oturum e-postasını kullan; yoksa dummy
-      const session = loadSession();
-      const testTo = session ? session.email : 'test@example.com';
-      await emailjs.send(service, template, {
-        to_email: testTo,
-        to_name:  session ? session.name : 'Test',
-        code:     '123456'
-      });
-      saveEjsConfig({ publicKey: pubkey, serviceId: service, templateId: template });
-      okEl.classList.add('show');
-      setTimeout(closeSetup, 1800);
-    } catch (err) {
-      const msg = err && err.text ? err.text : (err && err.message ? err.message : JSON.stringify(err));
-      errEl.textContent = 'Hata: ' + msg + ' — Bilgileri kontrol edip tekrar deneyin.';
-      errEl.classList.add('show');
-      emailjs.init('');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Kaydet & Test Et';
-    }
-  }
-
-  // ── AUTH STORAGE ───────────────────────────────────────────────
+  // ── STORAGE ───────────────────────────────────────────────────
   const USERS_KEY   = 'yat_users_v1';
   const SESSION_KEY = 'yat_session_v1';
   const RECORDS_KEY = 'yat_kasa_v1';
 
-  function loadUsers()   { try { return JSON.parse(localStorage.getItem(USERS_KEY))   || []; } catch { return []; } }
-  function saveUsers(u)  { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
-  function loadSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || null; } catch { return null; } }
-  function saveSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
-  function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+  function loadUsers()    { try { return JSON.parse(localStorage.getItem(USERS_KEY))   || []; } catch { return []; } }
+  function saveUsers(u)   { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+  function loadSession()  { try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || null; } catch { return null; } }
+  function saveSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+  function clearSession() { localStorage.removeItem(SESSION_KEY); }
+  function loadRecords()  { try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || []; } catch { return []; } }
+  function saveRecords(d) { localStorage.setItem(RECORDS_KEY, JSON.stringify(d)); }
 
-  // simple hash (djb2) — iç kullanım aracı, production şifresi değil
+  // ── UTILS ─────────────────────────────────────────────────────
   function hashPw(str) {
     let h = 5381;
     for (let i = 0; i < str.length; i++) h = ((h << 5) + h) ^ str.charCodeAt(i);
     return (h >>> 0).toString(16);
   }
-
-  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
-
-  // EmailJS başlat (kayıtlı credentials varsa)
-  initEmailJs();
-
-  // ── DOĞRULAMA KODU ────────────────────────────────────────────
-  // Bekleyen kayıt (henüz doğrulanmamış) — bellekte tutulur, localStorage'a yazılmaz
-  let pendingUser = null;
-  let pendingCode = null;
-  let resendTimer = null;
-
-  function generateCode() {
-    return String(Math.floor(100000 + Math.random() * 900000));
+  function uid()    { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+  function today()  { return new Date().toISOString().slice(0, 10); }
+  function fmtDate(d) {
+    if (!d) return '';
+    const [y, m, dd] = d.split('-');
+    return `${dd}.${m}.${y}`;
+  }
+  function fmt(num, birim) {
+    const syms = { TRY: '₺', EUR: '€', USD: '$', GBP: '£' };
+    return (syms[birim] || '') + Number(num).toLocaleString('tr-TR', { minimumFractionDigits: 2 });
+  }
+  function esc(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
   }
 
-  async function sendVerificationEmail(toEmail, toName, code) {
-    const c = getEjsCredentials();
-    return emailjs.send(c.serviceId, c.templateId, {
-      to_email: toEmail,
-      to_name:  toName,
-      code:     code
-    });
-  }
-
-  // Geri sayım için yardımcı
-  function startResendCountdown(secs) {
-    const btn = document.getElementById('btnResend');
-    btn.disabled = true;
-    let remaining = secs;
-    btn.textContent = `Tekrar gönder (${remaining}s)`;
-    clearInterval(resendTimer);
-    resendTimer = setInterval(() => {
-      remaining--;
-      if (remaining <= 0) {
-        clearInterval(resendTimer);
-        btn.disabled = false;
-        btn.textContent = 'Tekrar gönder';
-      } else {
-        btn.textContent = `Tekrar gönder (${remaining}s)`;
-      }
-    }, 1000);
-  }
-
-  // 6 kutucuklı kod girişi — klavye yönetimi
-  document.querySelectorAll('.code-digit').forEach(input => {
-    input.addEventListener('input', e => {
-      const val = e.target.value.replace(/\D/g, '');
-      e.target.value = val.slice(-1);
-      if (val && Number(e.target.dataset.idx) < 5) {
-        document.querySelectorAll('.code-digit')[Number(e.target.dataset.idx) + 1].focus();
-      }
-    });
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Backspace' && !e.target.value && Number(e.target.dataset.idx) > 0) {
-        document.querySelectorAll('.code-digit')[Number(e.target.dataset.idx) - 1].focus();
-      }
-      if (e.key === 'Enter') doVerify();
-    });
-    input.addEventListener('paste', e => {
-      e.preventDefault();
-      const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
-      document.querySelectorAll('.code-digit').forEach((inp, i) => { inp.value = pasted[i] || ''; });
-      if (pasted.length === 6) doVerify();
-    });
-  });
-
-  function getEnteredCode() {
-    return [...document.querySelectorAll('.code-digit')].map(i => i.value).join('');
-  }
-  function clearCodeInputs() {
-    document.querySelectorAll('.code-digit').forEach(i => i.value = '');
-    document.querySelectorAll('.code-digit')[0].focus();
-  }
-
-  async function resendCode() {
-    if (!pendingUser) return;
-    pendingCode = generateCode();
-    document.getElementById('verifyErr').classList.remove('show');
-    try {
-      await sendVerificationEmail(pendingUser.email, pendingUser.name, pendingCode);
-      startResendCountdown(60);
-      showToast('✉️ Yeni kod gönderildi.');
-    } catch (err) {
-      const detail = err && err.text ? err.text : '';
-      showToast('E-posta gönderilemedi' + (detail ? ': ' + detail : '') + '. Ayarları kontrol edin.');
-    }
-  }
-
-  function doVerify() {
-    const entered = getEnteredCode();
-    const errEl = document.getElementById('verifyErr');
-    errEl.classList.remove('show');
-
-    if (entered.length < 6) {
-      errEl.textContent = '6 haneli kodu eksiksiz girin.';
-      return errEl.classList.add('show');
-    }
-    if (entered !== pendingCode) {
-      errEl.textContent = 'Kod hatalı. Lütfen tekrar deneyin.';
-      errEl.classList.add('show');
-      clearCodeInputs();
-      return;
-    }
-
-    // Doğrulama başarılı — kullanıcıyı kaydet
-    const users = loadUsers();
-    users.push(pendingUser);
-    saveUsers(users);
-    pendingUser = null;
-    pendingCode = null;
-    clearInterval(resendTimer);
-    startSession(loadUsers().find(u => u.id === users[users.length - 1].id));
-    showToast('✓ Hesabınız doğrulandı, hoş geldiniz!');
-  }
+  let records = loadRecords();
+  let currentSession = null;
 
   // ── AUTH UI ────────────────────────────────────────────────────
   function switchTab(tab) {
-    const tabs   = { login: 'tabLogin', register: 'tabRegister', verify: null };
-    const panels = { login: 'panelLogin', register: 'panelRegister', verify: 'panelVerify' };
-
-    ['tabLogin','tabRegister'].forEach(id => {
-      document.getElementById(id).classList.toggle('active', id === tabs[tab]);
-    });
-    ['panelLogin','panelRegister','panelVerify'].forEach(id => {
-      document.getElementById(id).classList.toggle('active', id === panels[tab]);
-    });
-
-    // verify sekmesinde tab butonlarını gizle
-    document.querySelector('.auth-tabs').style.display = tab === 'verify' ? 'none' : '';
+    document.getElementById('tabLogin').classList.toggle('active',    tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('panelLogin').classList.toggle('active',    tab === 'login');
+    document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
     clearAuthErrors();
   }
 
@@ -1036,62 +533,33 @@
     el.classList.add('show');
   }
   function clearAuthErrors() {
-    ['loginErr','registerErr','verifyErr'].forEach(id => {
+    ['loginErr', 'registerErr'].forEach(id => {
       const el = document.getElementById(id);
       el.textContent = '';
       el.classList.remove('show');
     });
   }
 
-  async function doRegister() {
+  function doRegister() {
     clearAuthErrors();
     const name  = document.getElementById('r_name').value.trim();
     const email = document.getElementById('r_email').value.trim().toLowerCase();
     const pw    = document.getElementById('r_pw').value;
     const pw2   = document.getElementById('r_pw2').value;
 
-    if (!name)                         return showAuthError('registerErr', 'Ad Soyad boş bırakılamaz.');
+    if (!name)                          return showAuthError('registerErr', 'Ad Soyad boş bırakılamaz.');
     if (!email || !email.includes('@')) return showAuthError('registerErr', 'Geçerli bir e-posta girin.');
-    if (pw.length < 6)                 return showAuthError('registerErr', 'Şifre en az 6 karakter olmalı.');
-    if (pw !== pw2)                    return showAuthError('registerErr', 'Şifreler eşleşmiyor.');
+    if (pw.length < 6)                  return showAuthError('registerErr', 'Şifre en az 6 karakter olmalı.');
+    if (pw !== pw2)                     return showAuthError('registerErr', 'Şifreler eşleşmiyor.');
 
     const users = loadUsers();
     if (users.find(u => u.email === email)) return showAuthError('registerErr', 'Bu e-posta zaten kayıtlı.');
 
-    // Credentials kontrolü
-    if (!credentialsReady()) {
-      showAuthError('registerErr', 'E-posta servisi henüz kurulmamış.');
-      openSetup();
-      return;
-    }
-
-    // Kullanıcıyı henüz kaydetme — önce e-posta doğrula
-    pendingUser = { id: uid(), name, email, pwHash: hashPw(pw) };
-    pendingCode = generateCode();
-
-    // Butonu devre dışı bırak
-    const btn = document.querySelector('#panelRegister .btn-auth');
-    btn.disabled = true;
-    btn.textContent = 'Gönderiliyor...';
-
-    try {
-      await sendVerificationEmail(email, name, pendingCode);
-      document.getElementById('verifyEmailDisplay').textContent = email;
-      clearCodeInputs();
-      switchTab('verify');
-      startResendCountdown(60);
-    } catch (err) {
-      const detail = err && err.text ? err.text : (err && err.status ? `(${err.status})` : '');
-      showAuthError('registerErr',
-        'E-posta gönderilemedi' + (detail ? ': ' + detail : '') +
-        ' — ⚙️ ayarlarınızı kontrol edin.');
-      pendingUser = null;
-      pendingCode = null;
-      openSetup();
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Hesap Oluştur';
-    }
+    const user = { id: uid(), name, email, pwHash: hashPw(pw) };
+    users.push(user);
+    saveUsers(users);
+    startSession(user);
+    showToast('✓ Hesabınız oluşturuldu, hoş geldiniz!');
   }
 
   function doLogin() {
@@ -1119,8 +587,7 @@
     currentSession = null;
     document.getElementById('authOverlay').classList.remove('hidden');
     document.getElementById('appContainer').style.display = 'none';
-    document.getElementById('headerUser').style.display = 'none';
-    // clear login fields
+    document.getElementById('headerUser').style.display   = 'none';
     document.getElementById('l_email').value = '';
     document.getElementById('l_pw').value    = '';
     clearAuthErrors();
@@ -1139,35 +606,9 @@
     renderList();
   }
 
-  // ── ENTER with keyboard ────────────────────────────────────────
-  document.getElementById('l_pw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  // Enter tuşu desteği
+  document.getElementById('l_pw').addEventListener('keydown',  e => { if (e.key === 'Enter') doLogin(); });
   document.getElementById('r_pw2').addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
-
-  // ── DATA ──────────────────────────────────────────────────────
-  function loadRecords() { try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || []; } catch { return []; } }
-  function saveRecords(d){ localStorage.setItem(RECORDS_KEY, JSON.stringify(d)); }
-
-  let records = loadRecords();
-  let currentSession = null;
-
-  // ── UTILS ─────────────────────────────────────────────────────
-  function fmt(num, birim) {
-    const syms = { TRY: '₺', EUR: '€', USD: '$', GBP: '£' };
-    return (syms[birim] || '') + Number(num).toLocaleString('tr-TR', { minimumFractionDigits: 2 });
-  }
-  function fmtDate(d) {
-    if (!d) return '';
-    const [y, m, dd] = d.split('-');
-    return `${dd}.${m}.${y}`;
-  }
-  function today() { return new Date().toISOString().slice(0, 10); }
-
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2400);
-  }
 
   // ── DASHBOARD ─────────────────────────────────────────────────
   function renderDashboard() {
@@ -1185,9 +626,9 @@
       }
     });
 
-    const kasaEntries = Object.entries(kasaTotals);
+    const kasaEntries  = Object.entries(kasaTotals);
     const yoldaEntries = Object.entries(yoldaTotals);
-    const yoldaCount = records.filter(r => r.durum === 'yolda').length;
+    const yoldaCount   = records.filter(r => r.durum === 'yolda').length;
     let html = '';
 
     if (kasaEntries.length === 0) {
@@ -1244,19 +685,10 @@
             ? `<button class="btn btn-success" onclick="teslimAl('${r.id}')">✓ Kasaya Teslim Alındı</button>`
             : `<span style="font-size:.72rem;color:var(--green)">Kasada</span>`
           }
-          ${isMine
-            ? `<button class="btn btn-danger" onclick="sil('${r.id}')">Sil</button>`
-            : ''
-          }
+          ${isMine ? `<button class="btn btn-danger" onclick="sil('${r.id}')">Sil</button>` : ''}
         </div>
       </div>`;
     }).join('');
-  }
-
-  function esc(str) {
-    return String(str)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
   // ── ACTIONS ───────────────────────────────────────────────────
@@ -1316,13 +748,7 @@
   // ── INIT ──────────────────────────────────────────────────────
   (function init() {
     const session = loadSession();
-    if (session) {
-      applySession(session);
-    }
-    // Credentials eksikse kurulum sihirbazını göster
-    if (!credentialsReady()) {
-      openSetup();
-    }
+    if (session) applySession(session);
   })();
 </script>
 </body>
