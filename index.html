@@ -75,6 +75,149 @@
       transition: border-color .15s, color .15s;
     }
     #btnLogout:hover { border-color: var(--red); color: var(--red); }
+    #btnSetup {
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      padding: 5px 8px;
+      font-family: inherit;
+      transition: border-color .15s, color .15s;
+    }
+    #btnSetup:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── SETUP WIZARD ── */
+    #setupOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13,27,42,.85);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #setupOverlay.hidden { display: none; }
+    .setup-card {
+      background: var(--card);
+      border: 1px solid var(--gold);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 480px;
+      padding: 24px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .setup-card h2 {
+      font-size: 1rem;
+      color: var(--gold2);
+      margin-bottom: 4px;
+    }
+    .setup-card .setup-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .setup-steps {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    .setup-steps summary {
+      cursor: pointer;
+      color: var(--gold);
+      font-weight: 600;
+      font-size: 0.8rem;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .setup-steps summary::before { content: '▶'; font-size: .65rem; transition: transform .2s; }
+    details[open] .setup-steps summary::before { transform: rotate(90deg); }
+    details[open] .setup-steps { padding-bottom: 14px; }
+    .setup-steps ol { padding-left: 16px; margin-top: 10px; }
+    .setup-steps li { margin-bottom: 6px; }
+    .setup-steps code {
+      background: var(--navy3);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 0.82rem;
+      color: var(--gold2);
+      font-family: monospace;
+    }
+    .setup-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .setup-group label { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+    .setup-group input {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      font-family: monospace;
+      outline: none;
+      transition: border-color .15s;
+      width: 100%;
+    }
+    .setup-group input:focus { border-color: var(--gold); }
+    .setup-group .setup-hint { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+    .setup-error {
+      font-size: 0.78rem;
+      color: var(--red);
+      background: rgba(231,76,60,.08);
+      border: 1px solid rgba(231,76,60,.25);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .setup-error.show { display: block; }
+    .setup-success {
+      font-size: 0.78rem;
+      color: var(--green);
+      background: rgba(46,204,113,.08);
+      border: 1px solid rgba(46,204,113,.25);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .setup-success.show { display: block; }
+    .setup-btns { display: flex; gap: 10px; }
+    .btn-setup-save {
+      flex: 1;
+      padding: 11px;
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .15s;
+    }
+    .btn-setup-save:hover { opacity: .88; }
+    .btn-setup-skip {
+      padding: 11px 16px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color .15s;
+    }
+    .btn-setup-skip:hover { border-color: var(--muted); }
 
     /* ── AUTH OVERLAY ── */
     #authOverlay {
@@ -445,6 +588,55 @@
 </head>
 <body>
 
+<!-- ── EMAILJS SETUP WIZARD ── -->
+<div id="setupOverlay" class="hidden">
+  <div class="setup-card">
+    <h2>⚙️ EmailJS Kurulumu</h2>
+    <p class="setup-sub">E-posta doğrulaması için EmailJS bilgilerini girin. Ücretsiz.</p>
+
+    <details>
+      <div class="setup-steps">
+        <summary>📋 Bilgileri nereden alırım?</summary>
+        <ol>
+          <li><strong>emailjs.com</strong> adresine gidin → <em>Sign Up</em> ile ücretsiz hesap açın.</li>
+          <li>Sol menü → <strong>Email Services</strong> → <em>Add New Service</em> → Gmail seçin → Gmail hesabınızla bağlayın.<br/>
+              Bağlantı sonrası görünen <strong>Service ID</strong>'yi kopyalayın. <code>service_xxxxxxx</code></li>
+          <li>Sol menü → <strong>Email Templates</strong> → <em>Create New Template</em><br/>
+              &nbsp;• <em>Subject:</em> Doğrulama Kodunuz<br/>
+              &nbsp;• <em>To Email:</em> <code>&#123;&#123;to_email&#125;&#125;</code><br/>
+              &nbsp;• <em>Content:</em> Merhaba <code>&#123;&#123;to_name&#125;&#125;</code>, kodunuz: <code>&#123;&#123;code&#125;&#125;</code><br/>
+              Kaydet → <strong>Template ID</strong>'yi kopyalayın. <code>template_xxxxxxx</code></li>
+          <li>Sol üst → hesap adına tıklayın → <strong>Account</strong> → <em>General</em> bölümünde <strong>Public Key</strong>'i kopyalayın.</li>
+        </ol>
+      </div>
+    </details>
+
+    <div class="setup-group">
+      <label>Public Key</label>
+      <input type="text" id="s_pubkey" placeholder="örn. aBcDeFgHiJkLmN" autocomplete="off" />
+      <span class="setup-hint">Account → General → Public Key</span>
+    </div>
+    <div class="setup-group">
+      <label>Service ID</label>
+      <input type="text" id="s_service" placeholder="örn. service_abc1234" autocomplete="off" />
+      <span class="setup-hint">Email Services → servis adının yanındaki ID</span>
+    </div>
+    <div class="setup-group">
+      <label>Template ID</label>
+      <input type="text" id="s_template" placeholder="örn. template_xyz7890" autocomplete="off" />
+      <span class="setup-hint">Email Templates → şablon adının yanındaki ID</span>
+    </div>
+
+    <div class="setup-error"   id="setupErr"></div>
+    <div class="setup-success" id="setupOk">✓ Bağlantı başarılı! Artık e-posta gönderilebilir.</div>
+
+    <div class="setup-btns">
+      <button class="btn-setup-save" onclick="saveSetup()">Kaydet &amp; Test Et</button>
+      <button class="btn-setup-skip" onclick="closeSetup()">Şimdi değil</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── AUTH OVERLAY ── -->
 <div id="authOverlay">
   <div class="auth-logo">⚓</div>
@@ -526,6 +718,7 @@
   <h1>Kasa Takip Sistemi <span>Yat Turizm — Nakit Para Yönetimi</span></h1>
   <div id="headerUser" style="display:none">
     <span class="uname" id="headerName"></span>
+    <button id="btnSetup" onclick="openSetup()" title="EmailJS Ayarları">⚙️</button>
     <button id="btnLogout" onclick="doLogout()">Çıkış Yap</button>
   </div>
 </header>
@@ -602,19 +795,90 @@
 <div id="toast"></div>
 
 <script>
-  // ══════════════════════════════════════════════════════════════
-  //  EmailJS AYARLARI — emailjs.com üzerinden alın
-  //  1. emailjs.com → Ücretsiz kayıt
-  //  2. Email Services → Gmail bağla → Service ID'yi kopyala
-  //  3. Email Templates → Yeni şablon oluştur (aşağıdaki değişkenleri kullanın):
-  //     Konu : Kasa Takip — Doğrulama Kodunuz
-  //     İçerik: Merhaba {{to_name}}, doğrulama kodunuz: {{code}}
-  //     To Email alanı: {{to_email}}
-  //  4. Account → Public Key'i kopyala
-  // ══════════════════════════════════════════════════════════════
-  const EMAILJS_PUBLIC_KEY  = 'BURAYA_PUBLIC_KEY';   // örn. 'abc123XYZ'
-  const EMAILJS_SERVICE_ID  = 'BURAYA_SERVICE_ID';   // örn. 'service_xxxxxx'
-  const EMAILJS_TEMPLATE_ID = 'BURAYA_TEMPLATE_ID';  // örn. 'template_xxxxxx'
+  // ── EMAILJS CONFIG (localStorage'dan yüklenir) ────────────────
+  const EJSCONFIG_KEY = 'yat_emailjs_config';
+
+  function loadEjsConfig() {
+    try { return JSON.parse(localStorage.getItem(EJSCONFIG_KEY)) || {}; } catch { return {}; }
+  }
+  function saveEjsConfig(cfg) { localStorage.setItem(EJSCONFIG_KEY, JSON.stringify(cfg)); }
+
+  function getEjsCredentials() {
+    const cfg = loadEjsConfig();
+    return {
+      publicKey:  cfg.publicKey  || '',
+      serviceId:  cfg.serviceId  || '',
+      templateId: cfg.templateId || ''
+    };
+  }
+
+  function credentialsReady() {
+    const c = getEjsCredentials();
+    return c.publicKey && c.serviceId && c.templateId;
+  }
+
+  // EmailJS'i mevcut credentials ile (yeniden) başlat
+  function initEmailJs() {
+    const c = getEjsCredentials();
+    if (c.publicKey) emailjs.init(c.publicKey);
+  }
+
+  // ── SETUP WIZARD ──────────────────────────────────────────────
+  function openSetup() {
+    const c = getEjsCredentials();
+    document.getElementById('s_pubkey').value   = c.publicKey  || '';
+    document.getElementById('s_service').value  = c.serviceId  || '';
+    document.getElementById('s_template').value = c.templateId || '';
+    document.getElementById('setupErr').classList.remove('show');
+    document.getElementById('setupOk').classList.remove('show');
+    document.getElementById('setupOverlay').classList.remove('hidden');
+  }
+
+  function closeSetup() {
+    document.getElementById('setupOverlay').classList.add('hidden');
+  }
+
+  async function saveSetup() {
+    const pubkey   = document.getElementById('s_pubkey').value.trim();
+    const service  = document.getElementById('s_service').value.trim();
+    const template = document.getElementById('s_template').value.trim();
+    const errEl    = document.getElementById('setupErr');
+    const okEl     = document.getElementById('setupOk');
+    errEl.classList.remove('show');
+    okEl.classList.remove('show');
+
+    if (!pubkey || !service || !template) {
+      errEl.textContent = 'Üç alan da dolu olmalı.';
+      return errEl.classList.add('show');
+    }
+
+    const btn = document.querySelector('.btn-setup-save');
+    btn.disabled = true;
+    btn.textContent = 'Test ediliyor...';
+
+    try {
+      emailjs.init(pubkey);
+      // Test e-postası olarak kendi kaydedilmiş oturum e-postasını kullan; yoksa dummy
+      const session = loadSession();
+      const testTo = session ? session.email : 'test@example.com';
+      await emailjs.send(service, template, {
+        to_email: testTo,
+        to_name:  session ? session.name : 'Test',
+        code:     '123456'
+      });
+      saveEjsConfig({ publicKey: pubkey, serviceId: service, templateId: template });
+      okEl.classList.add('show');
+      setTimeout(closeSetup, 1800);
+    } catch (err) {
+      const msg = err && err.text ? err.text : (err && err.message ? err.message : JSON.stringify(err));
+      errEl.textContent = 'Hata: ' + msg + ' — Bilgileri kontrol edip tekrar deneyin.';
+      errEl.classList.add('show');
+      emailjs.init('');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Kaydet & Test Et';
+    }
+  }
 
   // ── AUTH STORAGE ───────────────────────────────────────────────
   const USERS_KEY   = 'yat_users_v1';
@@ -636,8 +900,8 @@
 
   function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
-  // EmailJS başlat
-  emailjs.init(EMAILJS_PUBLIC_KEY);
+  // EmailJS başlat (kayıtlı credentials varsa)
+  initEmailJs();
 
   // ── DOĞRULAMA KODU ────────────────────────────────────────────
   // Bekleyen kayıt (henüz doğrulanmamış) — bellekte tutulur, localStorage'a yazılmaz
@@ -650,7 +914,8 @@
   }
 
   async function sendVerificationEmail(toEmail, toName, code) {
-    return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    const c = getEjsCredentials();
+    return emailjs.send(c.serviceId, c.templateId, {
       to_email: toEmail,
       to_name:  toName,
       code:     code
@@ -715,8 +980,9 @@
       await sendVerificationEmail(pendingUser.email, pendingUser.name, pendingCode);
       startResendCountdown(60);
       showToast('✉️ Yeni kod gönderildi.');
-    } catch {
-      showToast('E-posta gönderilemedi, lütfen tekrar deneyin.');
+    } catch (err) {
+      const detail = err && err.text ? err.text : '';
+      showToast('E-posta gönderilemedi' + (detail ? ': ' + detail : '') + '. Ayarları kontrol edin.');
     }
   }
 
@@ -792,6 +1058,13 @@
     const users = loadUsers();
     if (users.find(u => u.email === email)) return showAuthError('registerErr', 'Bu e-posta zaten kayıtlı.');
 
+    // Credentials kontrolü
+    if (!credentialsReady()) {
+      showAuthError('registerErr', 'E-posta servisi henüz kurulmamış.');
+      openSetup();
+      return;
+    }
+
     // Kullanıcıyı henüz kaydetme — önce e-posta doğrula
     pendingUser = { id: uid(), name, email, pwHash: hashPw(pw) };
     pendingCode = generateCode();
@@ -808,9 +1081,13 @@
       switchTab('verify');
       startResendCountdown(60);
     } catch (err) {
-      showAuthError('registerErr', 'E-posta gönderilemedi. EmailJS ayarlarını kontrol edin.');
+      const detail = err && err.text ? err.text : (err && err.status ? `(${err.status})` : '');
+      showAuthError('registerErr',
+        'E-posta gönderilemedi' + (detail ? ': ' + detail : '') +
+        ' — ⚙️ ayarlarınızı kontrol edin.');
       pendingUser = null;
       pendingCode = null;
+      openSetup();
     } finally {
       btn.disabled = false;
       btn.textContent = 'Hesap Oluştur';
@@ -1042,7 +1319,10 @@
     if (session) {
       applySession(session);
     }
-    // else: authOverlay is already visible by default
+    // Credentials eksikse kurulum sihirbazını göster
+    if (!credentialsReady()) {
+      openSetup();
+    }
   })();
 </script>
 </body>
